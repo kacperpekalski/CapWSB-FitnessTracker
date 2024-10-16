@@ -8,5 +8,5 @@ import java.time.LocalDate;
 public record UserDto(@Nullable Long id, String firstName, String lastName,
                       @JsonFormat(pattern = "yyyy-MM-dd") LocalDate birthdate,
                       String email) {
-
 }
+

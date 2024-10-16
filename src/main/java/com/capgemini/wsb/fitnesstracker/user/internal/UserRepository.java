@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
- interface UserRepository extends JpaRepository<User, Long> {
+interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * Query searching users by email address. It matches by exact match.
@@ -21,6 +21,10 @@ import java.util.Optional;
                 .filter(user -> Objects.equals(user.getEmail(), email))
                 .findFirst();
     }
+
+
+    //the names are from JpaRepository, they cannot be changed
+    List<User> findByEmailContainingIgnoreCase(String emailFragment);
 
     List<User> findByFirstName(String firstName);
 

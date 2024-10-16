@@ -1,8 +1,7 @@
 package com.capgemini.wsb.fitnesstracker.user.internal;
 
-import com.capgemini.wsb.fitnesstracker.user.api.User;
-import com.capgemini.wsb.fitnesstracker.user.api.UserProvider;
-import com.capgemini.wsb.fitnesstracker.user.api.UserService;
+import com.capgemini.wsb.fitnesstracker.user.api.*;
+import com.capgemini.wsb.fitnesstracker.user.internal.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +28,29 @@ class UserServiceImpl implements UserService, UserProvider {
     }
 
     @Override
+    public void deleteUserById(Long userId) {
+        log.info("User with ID " + userId + " has been deleted");
+        userRepository.deleteById(userId);
+    }
+
+    @Override
+    public User updateUser(Long userId, UserDto userDto) {
+        User updateUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (userDto.firstName() != null)
+            updateUser.setFirstName(userDto.firstName());
+        if (userDto.lastName() != null)
+            updateUser.setLastName(userDto.lastName());
+        if (userDto.birthdate() != null)
+            updateUser.setBirthdate(userDto.birthdate());
+        if (userDto.email() != null)
+            updateUser.setEmail(userDto.email());
+
+        return userRepository.save(updateUser);
+    }
+
+    @Override
     public Optional<User> getUser(final Long userId) {
         return userRepository.findById(userId);
     }
@@ -39,12 +61,17 @@ class UserServiceImpl implements UserService, UserProvider {
     }
 
     @Override
+    public List<User> findUsersByEmailFragment(String emailFragment) {
+        return userRepository.findByEmailContainingIgnoreCase(emailFragment);
+    }
+
+    @Override
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
     @Override
-    public List<User> findUsersByCriteria(String firstName, String lastName, LocalDate birthdate, String email) {
+    public List<User> findUsersByAnything(String firstName, String lastName, LocalDate birthdate, String email) {
         List<User> users = new ArrayList<>();
         if (firstName != null) {
             users.addAll(userRepository.findByFirstName(firstName));
