@@ -1,6 +1,9 @@
 package com.capgemini.wsb.fitnesstracker.training.internal;
 
+import com.capgemini.wsb.fitnesstracker.training.api.Training;
 import com.capgemini.wsb.fitnesstracker.user.api.User;
+import com.capgemini.wsb.fitnesstracker.user.api.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -16,10 +19,31 @@ class TrainingController {
 
     private final TrainingServiceImpl trainingService;
     private final TrainingMapper trainingMapper;
+    private final UserService userService;
 
-    public TrainingController(TrainingServiceImpl trainingService, TrainingMapper trainingMapper) {
+    public TrainingController(TrainingServiceImpl trainingService, TrainingMapper trainingMapper, UserService userService) {
         this.trainingService = trainingService;
         this.trainingMapper = trainingMapper;
+        this.userService = userService;
+    }
+
+    /**
+     * Add a new training to the system.
+     *
+     * @param trainingDto the training data transfer object
+     *
+     * @return the created training with status 201
+     */
+    @PostMapping
+    public ResponseEntity<TrainingDto> addTraining(@RequestBody TrainingDto trainingDto) {
+        if (trainingDto.getUserId() == null) {
+            throw new IllegalArgumentException("User ID is missing in the request");
+        }
+        User user = userService.findUserById(trainingDto.getUserId());
+        Training training = trainingMapper.toEntity(trainingDto, user);
+        Training savedTraining = trainingService.addTraining(training);
+        TrainingDto savedTrainingDto = trainingMapper.toDto(savedTraining);
+        return ResponseEntity.status(201).body(savedTrainingDto);
     }
 
     /**
@@ -52,7 +76,6 @@ class TrainingController {
 
     /**
      * Get trainings finished after a specified date.
-     *
      * This endpoint retrieves all trainings that were completed after the provided date.
      * Example of usage:
      * <pre>
@@ -73,7 +96,6 @@ class TrainingController {
 
     /**
      * Get trainings by activity type.
-     *
      * This endpoint allows filtering trainings by their activity type.
      * Example of usage:
      * GET /v1/trainings/activityType?activityType=RUNNING
@@ -87,5 +109,17 @@ class TrainingController {
                 .stream()
                 .map(trainingMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Update an existing training.
+     *
+     * @param trainingId  the ID of the training to be updated
+     * @param trainingDto the updated training data
+     * @return the updated training
+     */
+    @PutMapping("/{trainingId}")
+    public Training updateTraining(@PathVariable Long trainingId, @RequestBody TrainingDto trainingDto) {
+        return trainingService.updateTraining(trainingId, trainingDto);
     }
 }

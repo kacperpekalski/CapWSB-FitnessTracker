@@ -19,6 +19,7 @@ class TrainingMapper {
 
         return new TrainingDto(
                 training.getId(),
+                training.getUser().getId(),
                 userDto,
                 training.getStartTime(),
                 training.getEndTime(),

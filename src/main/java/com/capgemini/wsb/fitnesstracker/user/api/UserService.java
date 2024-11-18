@@ -61,7 +61,7 @@ public interface UserService {
      * @param userId the ID of the user to find
      * @return the user with the given ID
      */
-    Optional<User> findUserById(Long userId);
+    User findUserById(Long userId);
 
     /**
      * Find user older than given date.

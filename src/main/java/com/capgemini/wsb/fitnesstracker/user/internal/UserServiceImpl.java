@@ -150,8 +150,8 @@ class UserServiceImpl implements UserService, UserProvider {
      * @return user with given ID
      */
     @Override
-    public Optional<User> findUserById(Long id) {
-        return userRepository.findById(id);
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     /**
