@@ -70,4 +70,13 @@ public interface UserService {
      * @return list of users older than the given date
      */
     List<User> findUsersOlderThanGivenDate(LocalDate time);
+
+    /**
+     * Get all Users
+     *
+     * @return list of all users in the system
+     */
+
+    List<User> findAllUsers();
+
 }

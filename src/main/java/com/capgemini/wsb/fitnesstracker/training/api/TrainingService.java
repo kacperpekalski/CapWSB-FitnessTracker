@@ -15,4 +15,5 @@ public interface TrainingService {
     List<Training> getTrainingsByActivityType(ActivityType activityType);
     List<Training> getFinishedTrainingsAfter(Date afterTime);
     Training updateTraining(Long trainingId, TrainingDto trainingDto);
+    int countByUserIdAndStartTimeBetween(Long userId);
 }

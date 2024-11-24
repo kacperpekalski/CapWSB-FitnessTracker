@@ -1,13 +1,14 @@
 package com.capgemini.wsb.fitnesstracker.training.internal;
 
 import com.capgemini.wsb.fitnesstracker.user.api.User;
-import com.capgemini.wsb.fitnesstracker.user.api.UserNotFoundException;
 import com.capgemini.wsb.fitnesstracker.user.api.UserService;
 import com.capgemini.wsb.fitnesstracker.training.api.*;
 import org.springframework.stereotype.Service;
 import com.capgemini.wsb.fitnesstracker.training.api.TrainingService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -77,4 +78,21 @@ class TrainingServiceImpl implements TrainingProvider, TrainingService {
 
         return trainingRepository.save(updateTraining);
     }
+
+    @Override
+    public int countByUserIdAndStartTimeBetween(Long userId) {
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MONTH, -1);
+        Date startOfLastMonth = calendar.getTime();
+
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Date endOfLastMonth = calendar.getTime();
+
+        return trainingRepository.countByUserIdAndStartTimeBetween(userId, startOfLastMonth, endOfLastMonth);
+    }
 }
+
+
